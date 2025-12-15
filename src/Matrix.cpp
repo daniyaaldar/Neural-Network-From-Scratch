@@ -1,29 +1,35 @@
 #include "Matrix.h"
+#include "MathUtility.h"
 #include <iostream>
 
-Matrix::Matrix(size_t numRows, size_t numCols, double fillValue)
-    :
-    m_numRows(numRows),
-    m_numCols(numCols)
+Matrix::Matrix(size_t numRows, size_t numCols)
+    : Matrix(numRows, numCols, 0.0)
 {
-    m_data.resize(m_numCols * m_numRows, fillValue);
+    for (double& v : m_data)
+        v = MathUtility::getRandomData();
+}
+
+Matrix::Matrix(size_t numRows, size_t numCols, double fillValue)
+    : Matrix(numRows, numCols, std::vector<double>(numRows * numCols, fillValue))
+{
 }
 
 Matrix::Matrix(size_t numRows, size_t numCols, const std::vector<double>& data)
-    :
+    : 
     m_numRows(numRows),
     m_numCols(numCols),
     m_data(data)
 {
+    if (m_numRows == 0 || m_numCols == 0)
+        throw std::invalid_argument("Matrix dimensions must be greater than 0");
+
     if (m_data.size() != m_numRows * m_numCols)
         throw std::invalid_argument("Data size does not match matrix dimensions");
 }
 
 Matrix::Matrix(const Matrix& m)
     : 
-    m_numRows(m.m_numRows),
-    m_numCols(m.m_numCols),
-    m_data(m.m_data)
+    Matrix(m.m_numRows, m.m_numCols, m.m_data)
 {
 }
 

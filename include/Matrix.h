@@ -6,9 +6,11 @@
 class Matrix
 {
 public:
-    Matrix(size_t numRows, size_t numCols, double fillValue = 0.0);
+    Matrix(size_t numRows, size_t numCols);
+    Matrix(size_t numRows, size_t numCols, double fillValue);
     Matrix(size_t numRows, size_t numCols, const std::vector<double>& data);
     Matrix(const Matrix& m);
+
     void print() const;
 
     Matrix operator+(const Matrix& other) const;
