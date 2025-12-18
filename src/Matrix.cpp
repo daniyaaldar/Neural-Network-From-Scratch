@@ -2,6 +2,11 @@
 #include "MathUtility.h"
 #include <iostream>
 
+Matrix::Matrix()
+    : Matrix(0, 0, 0.0)
+{
+}
+
 Matrix::Matrix(size_t numRows, size_t numCols)
     : Matrix(numRows, numCols, 0.0)
 {
@@ -20,16 +25,12 @@ Matrix::Matrix(size_t numRows, size_t numCols, const std::vector<double>& data)
     m_numCols(numCols),
     m_data(data)
 {
-    if (m_numRows == 0 || m_numCols == 0)
-        throw std::invalid_argument("Matrix dimensions must be greater than 0");
-
     if (m_data.size() != m_numRows * m_numCols)
         throw std::invalid_argument("Data size does not match matrix dimensions");
 }
 
 Matrix::Matrix(const Matrix& m)
-    : 
-    Matrix(m.m_numRows, m.m_numCols, m.m_data)
+    : Matrix(m.m_numRows, m.m_numCols, m.m_data)
 {
 }
 
@@ -95,13 +96,47 @@ Matrix& Matrix::operator=(const Matrix& other)
     return *this;
 }
 
+Matrix Matrix::Transpose() const
+{
+    Matrix m(m_numCols, m_numRows);
+
+    for (size_t i = 0; i < m_numRows; i++)
+    {
+        for (size_t j = 0; j < m_numCols; j++)
+        {
+            m.SetValue(j, i, GetValue(i, j));
+        }
+    }
+
+    return m;
+}
+
+double Matrix::dot(const Matrix& other) const
+{
+    if (m_numRows * m_numCols != other.m_numRows * other.m_numCols)
+        throw std::invalid_argument("Dot product requires same number of elements");
+
+    const size_t n = m_numRows * m_numCols;
+    double sum = 0.0;
+
+    for (size_t i = 0; i < n; ++i)
+        sum += m_data[i] * other.m_data[i];
+
+    return sum;
+}
+
+//double Matrix::dot(const Matrix& other) const
+//{
+//    return MathUtility::dot(m_data, other.m_data);
+//}
+
 void Matrix::print() const
 {
     for (size_t i = 0; i < m_numRows; i++)
     {
         for (size_t j = 0; j < m_numCols; j++)
         {
-            std::cout << m_data[i * m_numCols + j] << ", ";
+            std::cout << GetValue(i, j) << ", ";
         }
         std::cout << "\n";
     }        
