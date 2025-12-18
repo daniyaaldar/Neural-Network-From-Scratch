@@ -16,6 +16,6 @@ add_executable(
 	"include/Layer.h" 
 	"src/MathUtility.cpp" 
 	"include/MathUtility.h" 
-	"include/Matrix.h"
 	"src/Matrix.cpp"
+	"include/Matrix.h"
 )
