@@ -1,21 +1,10 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.20)
 project(Neural_Network_From_Scratch)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-include_directories(include)
-file(GLOB SOURCES "src/*.cpp")
+enable_testing()
 
-add_executable(
-	Neural_Network_From_Scratch ${SOURCES} 
-	"src/NeuralNetwork.cpp" 
-	"include/NeuralNetwork.h" 
-	"src/Neuron.cpp" 
-	"include/Neuron.h" 
-	"src/Layer.cpp" 
-	"include/Layer.h" 
-	"src/MathUtility.cpp" 
-	"include/MathUtility.h" 
-	"src/Matrix.cpp"
-	"include/Matrix.h"
-)
+add_subdirectory(src)
+add_subdirectory(tests)
