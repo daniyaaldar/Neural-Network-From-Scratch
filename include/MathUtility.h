@@ -12,12 +12,14 @@ class MathUtility
 public:
 	enum class ActivationFunction
 	{
+		LINEAR,
 		RELU,
 		SIGMOID
 	};
 
 	static double getRandomData(double min = -1, double max = 1);
 	static std::vector<double> getRandomData(size_t size, double min = -1, double max = 1);
+	static double linear(double x);
 	static double sigmoid(double x);
 	static double ReLu(double x);
 	static double sigmoidDerivative(double x);

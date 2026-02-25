@@ -27,6 +27,11 @@ std::vector<double> MathUtility::getRandomData(size_t size, double min, double m
     return result;
 }
 
+double MathUtility::linear(double x)
+{
+    return x;
+}
+
 double MathUtility::sigmoid(double x)
 {
     return 1.0 / (1.0 + std::exp(-x));
@@ -90,12 +95,14 @@ std::function<double(double)> MathUtility::getActivationFunc(ActivationFunction 
 {
     switch (activationFunc)
     {
+    case ActivationFunction::LINEAR:
+        return linear;
     case ActivationFunction::RELU:
         return ReLu;
     case ActivationFunction::SIGMOID:
         return sigmoid;
     default:
-        return sigmoid;
+        return linear;
     }
 }
 
