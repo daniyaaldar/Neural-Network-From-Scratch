@@ -4,6 +4,6 @@
 TEST(MatrixTest, Construction)
 {
     Matrix m(3, 4);
-    EXPECT_EQ(m.rows(), 3);
-    EXPECT_EQ(m.cols(), 4);
+    EXPECT_EQ(m.GetNumRows(), 3);
+    EXPECT_EQ(m.GetNumCols(), 4);
 }
