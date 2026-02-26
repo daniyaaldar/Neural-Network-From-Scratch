@@ -1,0 +1,24 @@
+name: Build and Test Project
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Configure CMake
+      run: cmake -B build
+
+    - name: Build Project
+      run: cmake --build build --config Release
+
+    - name: Run Unit Tests
+      run: ctest --test-dir build --output-on-failure
