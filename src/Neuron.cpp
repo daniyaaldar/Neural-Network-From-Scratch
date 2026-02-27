@@ -2,14 +2,26 @@
 #include <random>
 #include <iostream>
 
-Neuron::Neuron(size_t inputsPerNeuron, MathUtility::ActivationFunction activationFunc, double learningRate)
+Neuron::Neuron(size_t inputsPerNeuron, size_t outputsPerNeuron, MathUtility::ActivationFunction activationFunc, double learningRate, bool initialiseRandomData)
+    : 
+    m_output(0.0),
+    m_delta(0.0),
+    m_learningRate(learningRate),
+    m_activationFunc(MathUtility::getActivationFunc(activationFunc))
 {
-    setNumOfInputs(inputsPerNeuron);
-    m_bias = MathUtility::getRandomData(-10.0, 10.0);
-    m_output = 0.0;
-    m_delta = 0.0;
-    m_activationFunc = MathUtility::getActivationFunc(activationFunc);
-    m_learningRate = learningRate;
+    m_inputsPerNeuron = inputsPerNeuron;
+
+    if (initialiseRandomData)
+    {
+        double limit = std::sqrt(6.0 / (inputsPerNeuron + outputsPerNeuron)); // Xavier initialization
+        m_weights = MathUtility::getRandomData(inputsPerNeuron, -limit, limit);
+        m_bias = MathUtility::getRandomData(-limit, limit);
+    }
+    else
+    {
+        m_weights.assign(inputsPerNeuron, 0.0);
+        m_bias = 0.0;
+    }
 }
 
 void Neuron::print() const
@@ -37,9 +49,9 @@ double Neuron::activateDerivative(double x) const
     return x;
 }
 
-std::vector < double > Neuron::backwardsPropagate(double target)
+std::vector<double> Neuron::backwardsPropagate(double target)
 {
-    std::vector < double > res;
+    std::vector<double> res;
     return res;
 }
 

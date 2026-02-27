@@ -6,13 +6,13 @@
 class Neuron 
 {
 public:
-    Neuron(size_t inputsPerNeuron, MathUtility::ActivationFunction activationFunc, double learningRate);
+    Neuron(size_t numOfInputs, size_t numOfOutputs, MathUtility::ActivationFunction activationFunc, double learningRate, bool initialiseRandomData = false);
 
     void print() const;
     void setOutput(double output) { m_output = output; };
     void setBias(double bias) { m_bias = bias; };
     void setDelta(double delta) { m_delta = delta; };
-    void setNumOfInputs(size_t inputsPerNeuron) { m_weights = MathUtility::getRandomData(inputsPerNeuron, -1.0, 1.0); }
+    void setNumOfInputs(size_t numOfInputs) { m_weights = MathUtility::getRandomData(numOfInputs, -1.0, 1.0); }
     void setWeights(const std::vector<double>& weights) { m_weights = weights; };
     
     double getOutput() const { return m_output; };
@@ -32,6 +32,7 @@ private:
     double m_output;
     double m_delta;
     double m_learningRate;
+    size_t m_inputsPerNeuron = 0;
     std::function<double(double)> m_activationFunc;
     std::function<double(double)> m_activationDerivativeFunc;
 };
