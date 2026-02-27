@@ -6,7 +6,7 @@
 class Layer 
 {
 public:
-    Layer(size_t layerNum, size_t numOfNeurons, size_t inputsPerNeuron, size_t outputsPerNeuron, MathUtility::ActivationFunction activationFunc, double learningRate, bool initialiseRandomData = false);
+    Layer(size_t layerIdx, size_t numOfNeurons, size_t inputsPerNeuron, size_t outputsPerNeuron, MathUtility::ActivationFunction activationFunc, double learningRate, bool initialiseRandomData = false);
     ~Layer();
 
     void setOutputs(const std::vector<double>& outputs);
@@ -33,7 +33,7 @@ public:
     size_t getNumOfNeurons() const { return m_neurons.size(); }
     size_t getNumInputsPerNeuron() const { return m_inputsPerNeuron; }
 private:
-    size_t m_layerNum;
+    size_t m_layerIdx;
     size_t m_inputsPerNeuron;
     std::vector<std::unique_ptr<Neuron>> m_neurons;
 };

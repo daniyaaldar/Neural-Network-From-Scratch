@@ -66,8 +66,7 @@ double MathUtility::cost(const std::vector<double>& outputs, const std::vector<d
 
     for (size_t  i = 0; i < outputs.size(); i++)
     {
-        double diff = target[i] - outputs[i];
-        error += diff * diff;
+        error += std::pow(target[i] - outputs[i], 2);
     }
 
     return error;

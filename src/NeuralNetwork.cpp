@@ -86,15 +86,15 @@ void NeuralNetwork::setWeights(const std::vector<Matrix>& weights)
     }
 }
 
-void NeuralNetwork::setWeights(size_t layerNum, const Matrix& weights)
+void NeuralNetwork::setWeights(size_t layerIdx, const Matrix& weights)
 {
-    if (layerNum == 0 || layerNum >= m_layers.size())
+    if (layerIdx == 0 || layerIdx >= m_layers.size())
     {
         throw std::out_of_range("Invalid layer index for weights");
     }
 
-    size_t expectedRows = m_layers[layerNum]->getNumOfNeurons();
-    size_t expectedCols = m_layers[layerNum]->getNumInputsPerNeuron();
+    size_t expectedRows = m_layers[layerIdx]->getNumOfNeurons();
+    size_t expectedCols = m_layers[layerIdx]->getNumInputsPerNeuron();
 
     if (weights.GetNumRows() != expectedRows)
     {
@@ -106,9 +106,9 @@ void NeuralNetwork::setWeights(size_t layerNum, const Matrix& weights)
         throw std::invalid_argument("Weight column count mismatch");
     }
 
-    for (size_t neuronNum = 0; neuronNum < expectedRows; ++neuronNum)
+    for (size_t neuronIdx = 0; neuronIdx < expectedRows; ++neuronIdx)
     {
-        m_layers[layerNum]->setWeights(neuronNum, weights.getRow(neuronNum));
+        m_layers[layerIdx]->setWeights(neuronIdx, weights.getRow(neuronIdx));
     }
 }
 
@@ -125,47 +125,47 @@ void NeuralNetwork::setWeights(const std::vector<std::vector<std::vector<double>
     }
 }
 
-void NeuralNetwork::setWeights(size_t layerNum, const std::vector<std::vector<double>>& weights)
+void NeuralNetwork::setWeights(size_t layerIdx, const std::vector<std::vector<double>>& weights)
 {
-    if (layerNum == 0 || layerNum >= m_layers.size())
+    if (layerIdx == 0 || layerIdx >= m_layers.size())
     {
         throw std::out_of_range("Invalid layer index for weights");
     }
 
-    if (weights.size() != m_layers[layerNum]->getNumOfNeurons())
+    if (weights.size() != m_layers[layerIdx]->getNumOfNeurons())
     {
         throw std::invalid_argument("Weight neuron count mismatch");
     }
 
-    for (size_t neuronNum = 0; neuronNum < weights.size(); ++neuronNum)
+    for (size_t neuronIdx = 0; neuronIdx < weights.size(); ++neuronIdx)
     {
-        if (weights[neuronNum].size() != m_layers[layerNum]->getNumInputsPerNeuron())
+        if (weights[neuronIdx].size() != m_layers[layerIdx]->getNumInputsPerNeuron())
         {
             throw std::invalid_argument("Weight input count mismatch");
         }
 
-        setWeights(layerNum, neuronNum, weights[neuronNum]);
+        setWeights(layerIdx, neuronIdx, weights[neuronIdx]);
     }
 }
 
-void NeuralNetwork::setWeights(size_t layerNum, size_t neuronNum, const std::vector<double>& weights)
+void NeuralNetwork::setWeights(size_t layerIdx, size_t neuronIdx, const std::vector<double>& weights)
 {
-    if (layerNum == 0 || layerNum >= m_layers.size())
+    if (layerIdx == 0 || layerIdx >= m_layers.size())
     {
         throw std::out_of_range("Invalid layer index");
     }
 
-    if (neuronNum >= m_layers[layerNum]->getNumOfNeurons())
+    if (neuronIdx >= m_layers[layerIdx]->getNumOfNeurons())
     {
         throw std::out_of_range("Invalid neuron index");
     }
 
-    if (weights.size() != m_layers[layerNum]->getNumInputsPerNeuron())
+    if (weights.size() != m_layers[layerIdx]->getNumInputsPerNeuron())
     {
         throw std::invalid_argument("Weight size mismatch");
     }
 
-    m_layers[layerNum]->setWeights(neuronNum, weights);
+    m_layers[layerIdx]->setWeights(neuronIdx, weights);
 }
 
 void NeuralNetwork::setBiases(const std::vector<Matrix>& biases)
@@ -181,14 +181,14 @@ void NeuralNetwork::setBiases(const std::vector<Matrix>& biases)
     }
 }
 
-void NeuralNetwork::setBiases(size_t layerNum, const Matrix& biasMatrix)
+void NeuralNetwork::setBiases(size_t layerIdx, const Matrix& biasMatrix)
 {
-    if (layerNum == 0 || layerNum >= m_layers.size())
+    if (layerIdx == 0 || layerIdx >= m_layers.size())
     {
         throw std::out_of_range("Invalid layer index for biases");
     }
 
-    size_t expectedRows = m_layers[layerNum]->getNumOfNeurons();
+    size_t expectedRows = m_layers[layerIdx]->getNumOfNeurons();
 
     if (biasMatrix.GetNumRows() != expectedRows)
     {
@@ -200,9 +200,9 @@ void NeuralNetwork::setBiases(size_t layerNum, const Matrix& biasMatrix)
         throw std::invalid_argument("Bias matrix must be column vector");
     }
 
-    for (size_t neuronNum = 0; neuronNum < expectedRows; ++neuronNum)
+    for (size_t neuronIdx = 0; neuronIdx < expectedRows; ++neuronIdx)
     {
-        m_layers[layerNum]->setBias(neuronNum, biasMatrix.getRow(neuronNum)[0]);
+        m_layers[layerIdx]->setBias(neuronIdx, biasMatrix.getRow(neuronIdx)[0]);
     }
 }
 
@@ -213,41 +213,41 @@ void NeuralNetwork::setBiases(const std::vector<std::vector<double>>& biases)
         throw std::invalid_argument("Incorrect number of bias layers");
     }
 
-    for (size_t layerNum = 0; layerNum < biases.size(); ++layerNum)
+    for (size_t layerIdx = 0; layerIdx < biases.size(); ++layerIdx)
     {
-        setBiases(layerNum + 1, biases[layerNum]);
+        setBiases(layerIdx + 1, biases[layerIdx]);
     }
 }
 
-void NeuralNetwork::setBiases(size_t layerNum, const std::vector<double>& biases)
+void NeuralNetwork::setBiases(size_t layerIdx, const std::vector<double>& biases)
 {
-    if (layerNum == 0 || layerNum >= m_layers.size())
+    if (layerIdx == 0 || layerIdx >= m_layers.size())
     {
         throw std::out_of_range("Invalid layer index for biases");
     }
 
-    if (biases.size() != m_layers[layerNum]->getNumOfNeurons())
+    if (biases.size() != m_layers[layerIdx]->getNumOfNeurons())
     {
         throw std::invalid_argument("Bias count mismatch");
     }
 
-    for (size_t neuronNum = 0; neuronNum < biases.size(); ++neuronNum)
+    for (size_t neuronIdx = 0; neuronIdx < biases.size(); ++neuronIdx)
     {
-        setBias(layerNum, neuronNum, biases[neuronNum]);
+        setBias(layerIdx, neuronIdx, biases[neuronIdx]);
     }
 }
 
-void NeuralNetwork::setBias(size_t layerNum, size_t neuronNum, double bias)
+void NeuralNetwork::setBias(size_t layerIdx, size_t neuronIdx, double bias)
 {
-    if (layerNum == 0 || layerNum >= m_layers.size())
+    if (layerIdx == 0 || layerIdx >= m_layers.size())
     {
         throw std::out_of_range("Invalid layer index");
     }
 
-    if (neuronNum >= m_layers[layerNum]->getNumOfNeurons())
+    if (neuronIdx >= m_layers[layerIdx]->getNumOfNeurons())
     {
         throw std::out_of_range("Invalid neuron index");
     }
 
-    m_layers[layerNum]->setBias(neuronNum, bias);
+    m_layers[layerIdx]->setBias(neuronIdx, bias);
 }

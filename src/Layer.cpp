@@ -3,9 +3,9 @@
 #include <cassert>
 #include <string>
 
-Layer::Layer(size_t layerNum, size_t numOfNeurons, size_t inputsPerNeuron, size_t outputsPerNeuron, MathUtility::ActivationFunction activationFunc, double learningRate, bool initialiseRandomData)
+Layer::Layer(size_t layerIdx, size_t numOfNeurons, size_t inputsPerNeuron, size_t outputsPerNeuron, MathUtility::ActivationFunction activationFunc, double learningRate, bool initialiseRandomData)
 {
-    m_layerNum = layerNum;
+    m_layerIdx = layerIdx;
     m_inputsPerNeuron = inputsPerNeuron;
 
     for (size_t i = 0; i < numOfNeurons; i++)
