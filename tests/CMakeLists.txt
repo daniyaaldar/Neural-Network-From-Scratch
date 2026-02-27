@@ -14,7 +14,7 @@ add_executable(neural_network_tests
 
 target_link_libraries(neural_network_tests
     PRIVATE
-        my_lib
+        neural_network_lib
         GTest::gtest_main
 )
 

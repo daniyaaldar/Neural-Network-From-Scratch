@@ -20,5 +20,6 @@ jobs:
     - name: Build Project
       run: cmake --build build --config Release
 
+  test:
     - name: Run Unit Tests
       run: ctest --test-dir build --output-on-failure
