@@ -7,16 +7,15 @@ class Matrix
 {
 public:
     Matrix();
-    Matrix(size_t numRows, size_t numCols);
-    Matrix(size_t numRows, size_t numCols, double fillValue);
-    Matrix(size_t numRows, size_t numCols, const std::vector<double>& data);
+    Matrix(size_t rows, size_t cols, double fillValue = 0.0);
+    Matrix(size_t rows, size_t cols, const std::vector<double>& data);
     Matrix(const Matrix& m);
 
-    void SetValue(size_t row, size_t col, double value) { m_data[row * m_numCols + col] = value; }
+    void SetValue(size_t row, size_t col, double value) { m_data[row * m_cols + col] = value; }
 
-    size_t GetNumRows() const { return m_numRows; }
-    size_t GetNumCols() const { return m_numCols; }
-    double GetValue(size_t row, size_t col) const { return m_data[row * m_numCols + col]; }
+    size_t GetRows() const { return m_rows; }
+    size_t GetCols() const { return m_cols; }
+    double GetValue(size_t row, size_t col) const { return m_data[row * m_cols + col]; }
 
     std::vector<double> getRow(size_t row) const;
     std::vector<double> getCol(size_t col) const;
@@ -30,9 +29,12 @@ public:
     Matrix operator*(const Matrix& other) const;
     Matrix& operator*=(const Matrix& other);
     Matrix& operator=(const Matrix& other);
+    bool operator==(const Matrix& other) const;
+    double& operator()(size_t row, size_t col);
+    const double& operator()(size_t row, size_t col) const;
 
 private:
-    size_t m_numRows;
-    size_t m_numCols;
+    size_t m_rows;
+    size_t m_cols;
     std::vector<double> m_data;
 };

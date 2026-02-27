@@ -1,66 +1,123 @@
 #include "Matrix.h"
 #include "MathUtility.h"
 #include <iostream>
+#include <string>
 
 Matrix::Matrix()
     : Matrix(0, 0, 0.0)
 {
 }
 
-Matrix::Matrix(size_t numRows, size_t numCols)
-    : Matrix(numRows, numCols, 0.0)
-{
-    for (double& v : m_data)
-        v = MathUtility::getRandomData();
-}
-
-Matrix::Matrix(size_t numRows, size_t numCols, double fillValue)
-    : Matrix(numRows, numCols, std::vector<double>(numRows * numCols, fillValue))
+Matrix::Matrix(size_t rows, size_t cols, double fillValue)
+    : Matrix(rows, cols, std::vector<double>(rows * cols, fillValue))
 {
 }
 
-Matrix::Matrix(size_t numRows, size_t numCols, const std::vector<double>& data)
+Matrix::Matrix(size_t rows, size_t cols, const std::vector<double>& data)
     : 
-    m_numRows(numRows),
-    m_numCols(numCols),
+    m_rows(rows),
+    m_cols(cols),
     m_data(data)
 {
-    if (m_data.size() != m_numRows * m_numCols)
-        throw std::invalid_argument("Data size does not match matrix dimensions");
+    if (m_data.size() != m_rows * m_cols)
+    {
+        throw std::out_of_range("Data size does not match matrix dimensions");
+    }
 }
 
 Matrix::Matrix(const Matrix& m)
-    : Matrix(m.m_numRows, m.m_numCols, m.m_data)
+    : Matrix(m.m_rows, m.m_cols, m.m_data)
 {
 }
 
-
 std::vector<double> Matrix::getRow(size_t row) const
 {
-    std::vector<double> result;
-    result.reserve(m_numCols);
+    if (row >= m_rows)
+    {
+        throw std::out_of_range("Matrix row index out of range");
+    }
 
-    for (size_t c = 0; c < m_numCols; ++c)
-        result.push_back(m_data[row * m_numCols + c]);
+    std::vector<double> result;
+    result.reserve(m_cols);
+
+    for (size_t c = 0; c < m_cols; ++c)
+    {
+        result.push_back(m_data[row * m_cols + c]);
+    }
 
     return result;
 }
 
 std::vector<double> Matrix::getCol(size_t col) const
 {
-    std::vector<double> result;
-    result.reserve(m_numRows);
+    if (col >= m_cols)
+    {
+        throw std::out_of_range("Matrix col index out of range");
+    }
 
-    for (size_t r = 0; r < m_numRows; ++r)
-        result.push_back(m_data[r * m_numCols + col]);
+    std::vector<double> result;
+    result.reserve(m_rows);
+
+    for (size_t r = 0; r < m_rows; ++r)
+    {
+        result.push_back(m_data[r * m_cols + col]);
+    }
 
     return result;
 }
 
+Matrix Matrix::Transpose() const
+{
+    Matrix m(m_cols, m_rows);
+
+    for (size_t i = 0; i < m_rows; i++)
+    {
+        for (size_t j = 0; j < m_cols; j++)
+        {
+            m.SetValue(j, i, GetValue(i, j));
+        }
+    }
+
+    return m;
+}
+
+double Matrix::dot(const Matrix& other) const
+{
+    if (m_rows * m_cols != other.m_rows * other.m_cols)
+    {
+        throw std::invalid_argument("Dot product requires same number of elements");
+    }
+
+    const size_t n = m_rows * m_cols;
+    double sum = 0.0;
+
+    for (size_t i = 0; i < n; ++i)
+    {
+        sum += m_data[i] * other.m_data[i];
+    }
+
+    return sum;
+}
+
+void Matrix::print() const
+{
+    for (size_t i = 0; i < m_rows; i++)
+    {
+        for (size_t j = 0; j < m_cols; j++)
+        {
+            std::cout << GetValue(i, j) << ", ";
+        }
+        std::cout << "\n";
+    }        
+    std::cout << "\n";
+}
+
 Matrix Matrix::operator+(const Matrix& other) const
 {
-    if (this->m_numCols != other.m_numCols || this->m_numRows != other.m_numRows)
+    if (this->m_cols != other.m_cols || this->m_rows != other.m_rows)
+    {
         throw std::invalid_argument("Matrix dimensions do not allow addition");
+    }
 
     Matrix m = *this;
 
@@ -74,18 +131,20 @@ Matrix Matrix::operator+(const Matrix& other) const
 
 Matrix Matrix::operator*(const Matrix& other) const
 {
-    if (this->m_numCols != other.m_numRows)
-        throw std::invalid_argument("Matrix dimensions do not allow multiplication");
-
-    Matrix m(this->m_numRows, other.m_numCols, 0.0);
-
-    for (size_t i = 0; i < this->m_numRows; i++)
+    if (this->m_cols != other.m_rows)
     {
-        for (size_t j = 0; j < other.m_numCols; j++)
+        throw std::invalid_argument("Matrix dimensions do not allow multiplication");
+    }
+
+    Matrix m(this->m_rows, other.m_cols, 0.0);
+
+    for (size_t i = 0; i < this->m_rows; i++)
+    {
+        for (size_t j = 0; j < other.m_cols; j++)
         {
-            for (size_t k = 0; k < this->m_numCols; k++)
+            for (size_t k = 0; k < this->m_cols; k++)
             {
-                m.m_data[i * m.m_numCols + j] += this->m_data[i * m_numCols + k] * other.m_data[k * other.m_numCols + j];
+                m.m_data[i * m.m_cols + j] += this->m_data[i * m_cols + k] * other.m_data[k * other.m_cols + j];
             }
         }
     }
@@ -111,57 +170,37 @@ Matrix& Matrix::operator=(const Matrix& other)
 {
     if (this != &other)
     {
-        m_numRows = other.m_numRows;
-        m_numCols = other.m_numCols;
+        m_rows = other.m_rows;
+        m_cols = other.m_cols;
         m_data = other.m_data;
     }
 
     return *this;
 }
 
-Matrix Matrix::Transpose() const
+bool Matrix::operator==(const Matrix& other) const
 {
-    Matrix m(m_numCols, m_numRows);
+    return m_rows == other.m_rows && 
+           m_cols == other.m_cols && 
+           m_data == other.m_data;
+}
 
-    for (size_t i = 0; i < m_numRows; i++)
+double& Matrix::operator()(size_t row, size_t col)
+{
+    if (row >= m_rows || col >= m_cols)
     {
-        for (size_t j = 0; j < m_numCols; j++)
-        {
-            m.SetValue(j, i, GetValue(i, j));
-        }
+        throw std::out_of_range("Matrix index out of range");
     }
 
-    return m;
+    return m_data[row * m_cols + col];
 }
 
-double Matrix::dot(const Matrix& other) const
+const double& Matrix::operator()(size_t row, size_t col) const
 {
-    if (m_numRows * m_numCols != other.m_numRows * other.m_numCols)
-        throw std::invalid_argument("Dot product requires same number of elements");
-
-    const size_t n = m_numRows * m_numCols;
-    double sum = 0.0;
-
-    for (size_t i = 0; i < n; ++i)
-        sum += m_data[i] * other.m_data[i];
-
-    return sum;
-}
-
-//double Matrix::dot(const Matrix& other) const
-//{
-//    return MathUtility::dot(m_data, other.m_data);
-//}
-
-void Matrix::print() const
-{
-    for (size_t i = 0; i < m_numRows; i++)
+    if (row >= m_rows || col >= m_cols)
     {
-        for (size_t j = 0; j < m_numCols; j++)
-        {
-            std::cout << GetValue(i, j) << ", ";
-        }
-        std::cout << "\n";
-    }        
-    std::cout << "\n";
+        throw std::out_of_range("Matrix index out of range");
+    }
+
+    return m_data[row * m_cols + col];
 }
