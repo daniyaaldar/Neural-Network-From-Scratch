@@ -105,3 +105,23 @@ std::function<double(double)> MathUtility::getActivationFunc(ActivationFunction 
     }
 }
 
+std::function<double(double)> MathUtility::getActivationDerivativeFunc(ActivationFunction activationFunc)
+{
+    switch (activationFunc)
+    {
+    case MathUtility::ActivationFunction::LINEAR:
+        return [](double) { return 1.0; };
+    case MathUtility::ActivationFunction::RELU:
+        return [](double x) { return x > 0.0 ? 1.0 : 0.0; };
+    case MathUtility::ActivationFunction::SIGMOID:
+        return sigmoidDerivative;
+    default:
+        return [](double) { return 1.0; };
+    }
+}
+
+double MathUtility::getActivationDerivativeFuncOutput(ActivationFunction activationFunc, double output)
+{
+    return getActivationDerivativeFunc(activationFunc)(output);
+}
+
