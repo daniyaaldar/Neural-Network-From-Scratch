@@ -18,6 +18,8 @@ public:
     size_t GetNumCols() const { return m_numCols; }
     double GetValue(size_t row, size_t col) const { return m_data[row * m_numCols + col]; }
 
+    std::vector<double> getRow(size_t row) const;
+    std::vector<double> getCol(size_t col) const;
 
     Matrix Transpose() const;
     double dot(const Matrix& other) const;

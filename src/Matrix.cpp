@@ -34,6 +34,29 @@ Matrix::Matrix(const Matrix& m)
 {
 }
 
+
+std::vector<double> Matrix::getRow(size_t row) const
+{
+    std::vector<double> result;
+    result.reserve(m_numCols);
+
+    for (size_t c = 0; c < m_numCols; ++c)
+        result.push_back(m_data[row * m_numCols + c]);
+
+    return result;
+}
+
+std::vector<double> Matrix::getCol(size_t col) const
+{
+    std::vector<double> result;
+    result.reserve(m_numRows);
+
+    for (size_t r = 0; r < m_numRows; ++r)
+        result.push_back(m_data[r * m_numCols + col]);
+
+    return result;
+}
+
 Matrix Matrix::operator+(const Matrix& other) const
 {
     if (this->m_numCols != other.m_numCols || this->m_numRows != other.m_numRows)
