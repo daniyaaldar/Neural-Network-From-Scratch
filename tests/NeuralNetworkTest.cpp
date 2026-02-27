@@ -132,18 +132,9 @@ TEST(NeuralNetworkTest, FeedFowardWithMatrix)
         })
     };
 
-    std::vector<Matrix> biases =
-    {
-        Matrix(2, 1,
-        {
-            -1.0, // Layer 2 Neuron 1
-            2.0, // Layer 2 Neuron 2
-        }),
-
-        Matrix(1, 1,
-        {
-            -5.0  // Layer 3 Neuron 1
-        })
+    std::vector<std::vector<double>> biases = {
+        { { -1.0, 2.0 } },
+        { { -5.0 } }
     };
 
     nn.setWeights(weights);

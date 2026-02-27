@@ -4,6 +4,9 @@
 #include <string>
 
 NeuralNetwork::NeuralNetwork(const std::vector<size_t>& topology, MathUtility::ActivationFunction activationFunc, double learningRate)
+    : 
+    m_activationFunc(activationFunc),
+    m_learningRate(learningRate)
 {
     if (learningRate <= 0.0)
     {
@@ -67,7 +70,7 @@ void NeuralNetwork::backwardsPropagate(const std::vector<double>& targets)
 {
     if (targets.size() != m_layers.back()->getNumOfNeurons())
     {
-        throw std::invalid_argument("Target size does not match number of neurons in output layer (Has " + std::to_string(targets.size()) + ", expecting " + std::to_string(m_layers.front()->getNumOfNeurons()) + ")");
+        throw std::invalid_argument("Target size does not match number of neurons in output layer (Has " + std::to_string(targets.size()) + ", expecting " + std::to_string(m_layers.back()->getNumOfNeurons()) + ")");
     }
 
     // TODO
@@ -86,32 +89,6 @@ void NeuralNetwork::setWeights(const std::vector<Matrix>& weights)
     }
 }
 
-void NeuralNetwork::setWeights(size_t layerIdx, const Matrix& weights)
-{
-    if (layerIdx == 0 || layerIdx >= m_layers.size())
-    {
-        throw std::out_of_range("Invalid layer index for weights");
-    }
-
-    size_t expectedRows = m_layers[layerIdx]->getNumOfNeurons();
-    size_t expectedCols = m_layers[layerIdx]->getNumInputsPerNeuron();
-
-    if (weights.GetNumRows() != expectedRows)
-    {
-        throw std::invalid_argument("Weight row count mismatch");
-    }
-
-    if (weights.GetNumCols() != expectedCols)
-    {
-        throw std::invalid_argument("Weight column count mismatch");
-    }
-
-    for (size_t neuronIdx = 0; neuronIdx < expectedRows; ++neuronIdx)
-    {
-        m_layers[layerIdx]->setWeights(neuronIdx, weights.getRow(neuronIdx));
-    }
-}
-
 void NeuralNetwork::setWeights(const std::vector<std::vector<std::vector<double>>>& weights)
 {
     if (weights.size() != m_layers.size() - 1)
@@ -122,6 +99,32 @@ void NeuralNetwork::setWeights(const std::vector<std::vector<std::vector<double>
     for (size_t layerIdx = 0; layerIdx < weights.size(); ++layerIdx)
     {
         setWeights(layerIdx + 1, weights[layerIdx]);
+    }
+}
+
+void NeuralNetwork::setWeights(size_t layerIdx, const Matrix& weights)
+{
+    if (layerIdx == 0 || layerIdx >= m_layers.size())
+    {
+        throw std::out_of_range("Invalid layer index for weights");
+    }
+
+    size_t expectedRows = m_layers[layerIdx]->getNumOfNeurons();
+    size_t expectedCols = m_layers[layerIdx]->getNumInputsPerNeuron();
+
+    if (weights.GetRows() != expectedRows)
+    {
+        throw std::invalid_argument("Weight row count mismatch");
+    }
+
+    if (weights.GetCols() != expectedCols)
+    {
+        throw std::invalid_argument("Weight column count mismatch");
+    }
+
+    for (size_t neuronIdx = 0; neuronIdx < expectedRows; ++neuronIdx)
+    {
+        m_layers[layerIdx]->setWeights(neuronIdx, weights.getRow(neuronIdx));
     }
 }
 
@@ -166,44 +169,6 @@ void NeuralNetwork::setWeights(size_t layerIdx, size_t neuronIdx, const std::vec
     }
 
     m_layers[layerIdx]->setWeights(neuronIdx, weights);
-}
-
-void NeuralNetwork::setBiases(const std::vector<Matrix>& biases)
-{
-    if (biases.size() != m_layers.size() - 1)
-    {
-        throw std::invalid_argument("Incorrect number of bias matrices");
-    }
-
-    for (size_t layerIdx = 0; layerIdx < biases.size(); ++layerIdx)
-    {
-        setBiases(layerIdx + 1, biases[layerIdx]);
-    }
-}
-
-void NeuralNetwork::setBiases(size_t layerIdx, const Matrix& biasMatrix)
-{
-    if (layerIdx == 0 || layerIdx >= m_layers.size())
-    {
-        throw std::out_of_range("Invalid layer index for biases");
-    }
-
-    size_t expectedRows = m_layers[layerIdx]->getNumOfNeurons();
-
-    if (biasMatrix.GetNumRows() != expectedRows)
-    {
-        throw std::invalid_argument("Bias row count mismatch");
-    }
-
-    if (biasMatrix.GetNumCols() != 1)
-    {
-        throw std::invalid_argument("Bias matrix must be column vector");
-    }
-
-    for (size_t neuronIdx = 0; neuronIdx < expectedRows; ++neuronIdx)
-    {
-        m_layers[layerIdx]->setBias(neuronIdx, biasMatrix.getRow(neuronIdx)[0]);
-    }
 }
 
 void NeuralNetwork::setBiases(const std::vector<std::vector<double>>& biases)
