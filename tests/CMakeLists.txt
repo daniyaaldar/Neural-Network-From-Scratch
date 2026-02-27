@@ -10,7 +10,7 @@ FetchContent_MakeAvailable(googletest)
 
 add_executable(neural_network_tests
     "MatrixTest.cpp"
-    "MathUtilityTest.cpp" "NeuronTest.cpp")
+    "MathUtilityTest.cpp" "NeuronTest.cpp" "LayerTest.cpp" "NeuralNetworkTest.cpp")
 
 target_link_libraries(neural_network_tests
     PRIVATE
