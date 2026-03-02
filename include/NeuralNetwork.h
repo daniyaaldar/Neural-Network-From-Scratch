@@ -8,7 +8,7 @@
 
 class NeuralNetwork {
 public:
-    NeuralNetwork(const std::vector<size_t>& topology, MathUtility::ActivationFunction activationFunc, double learningRate);
+    NeuralNetwork(const std::vector<size_t>& topology, MathUtility::ActivationFunction activationFunc, double learningRate, bool initialiseRandomWeights = true);
     ~NeuralNetwork();
 
     void print() const;

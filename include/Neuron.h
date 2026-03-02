@@ -27,7 +27,8 @@ public:
     void calculateDelta(double target);
 
 private:    
-    size_t m_inputsPerNeuron = 0;
+    size_t m_numOfInputs = 0;
+    size_t m_numOfOutputs = 0;
     std::vector<double> m_weights; // input weights
     double m_bias;
     double m_output;

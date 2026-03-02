@@ -3,14 +3,14 @@
 #include <cassert>
 #include <string>
 
-Layer::Layer(size_t layerIdx, size_t numOfNeurons, size_t inputsPerNeuron, size_t outputsPerNeuron, MathUtility::ActivationFunction activationFunc, double learningRate, bool initialiseRandomData)
+Layer::Layer(size_t layerIdx, size_t numOfNeurons, size_t inputsPerNeuron, size_t outputsPerNeuron, MathUtility::ActivationFunction activationFunc, double learningRate, bool initialiseRandomWeights)
 {
     m_layerIdx = layerIdx;
     m_inputsPerNeuron = inputsPerNeuron;
 
     for (size_t i = 0; i < numOfNeurons; i++)
     {
-        m_neurons.push_back(std::make_unique<Neuron>(inputsPerNeuron, outputsPerNeuron, activationFunc, learningRate, initialiseRandomData));
+        m_neurons.push_back(std::make_unique<Neuron>(inputsPerNeuron, outputsPerNeuron, activationFunc, learningRate, initialiseRandomWeights));
     }
 }
 
