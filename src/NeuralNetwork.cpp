@@ -3,7 +3,7 @@
 #include <stdexcept>
 #include <string>
 
-NeuralNetwork::NeuralNetwork(const std::vector<size_t>& topology, MathUtility::ActivationFunction activationFunc, double learningRate)
+NeuralNetwork::NeuralNetwork(const std::vector<size_t>& topology, MathUtility::ActivationFunction activationFunc, double learningRate, bool initialiseRandomWeights)
     : 
     m_activationFunc(activationFunc),
     m_learningRate(learningRate)
@@ -33,7 +33,7 @@ NeuralNetwork::NeuralNetwork(const std::vector<size_t>& topology, MathUtility::A
         size_t inputsPerNeuron = (i == 0) ? 0 : topology[i - 1];
         size_t outputsPerNeuron = (i == topology.size() - 1) ? 0 : topology[i + 1];
 
-        m_layers.push_back(std::make_unique<Layer>(i, topology[i], inputsPerNeuron, outputsPerNeuron, activationFunc, learningRate));
+        m_layers.push_back(std::make_unique<Layer>(i, topology[i], inputsPerNeuron, outputsPerNeuron, activationFunc, learningRate, initialiseRandomWeights));
     }
 }
 

@@ -6,7 +6,7 @@
 class Layer 
 {
 public:
-    Layer(size_t layerIdx, size_t numOfNeurons, size_t inputsPerNeuron, size_t outputsPerNeuron, MathUtility::ActivationFunction activationFunc, double learningRate, bool initialiseRandomData = false);
+    Layer(size_t layerIdx, size_t numOfNeurons, size_t inputsPerNeuron, size_t outputsPerNeuron, MathUtility::ActivationFunction activationFunc, double learningRate, bool initialiseRandomWeights = true);
     ~Layer();
 
     void setOutputs(const std::vector<double>& outputs);

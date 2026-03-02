@@ -6,7 +6,7 @@
 class Neuron 
 {
 public:
-    Neuron(size_t numOfInputs, size_t numOfOutputs, MathUtility::ActivationFunction activationFunc, double learningRate, bool initialiseRandomData = false);
+    Neuron(size_t numOfInputs, size_t numOfOutputs, MathUtility::ActivationFunction activationFunc, double learningRate, bool initialiseRandomWeights = true);
 
     void print() const;
     void setOutput(double output) { m_output = output; };
@@ -26,13 +26,13 @@ public:
     std::vector<double> backwardsPropagate(double target);
     void calculateDelta(double target);
 
-private:
+private:    
+    size_t m_inputsPerNeuron = 0;
     std::vector<double> m_weights; // input weights
     double m_bias;
     double m_output;
     double m_delta;
     double m_learningRate;
-    size_t m_inputsPerNeuron = 0;
     std::function<double(double)> m_activationFunc;
     std::function<double(double)> m_activationDerivativeFunc;
 };

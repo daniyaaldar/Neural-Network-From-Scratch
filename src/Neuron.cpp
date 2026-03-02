@@ -2,25 +2,25 @@
 #include <random>
 #include <iostream>
 
-Neuron::Neuron(size_t numOfInputs, size_t numOfOutputs, MathUtility::ActivationFunction activationFunc, double learningRate, bool initialiseRandomData)
+Neuron::Neuron(size_t numOfInputs, size_t numOfOutputs, MathUtility::ActivationFunction activationFunc, double learningRate, bool initialiseRandomWeights)
     : 
+    m_numOfInputs(numOfInputs),
+    m_numOfOutputs(numOfOutputs),
+    m_bias(0.0),
     m_output(0.0),
     m_delta(0.0),
     m_learningRate(learningRate),
-    m_activationFunc(MathUtility::getActivationFunc(activationFunc))
+    m_activationFunc(MathUtility::getActivationFunc(activationFunc)),
+    m_activationDerivativeFunc(MathUtility::getActivationDerivativeFunc(activationFunc))
 {
-    m_inputsPerNeuron = numOfInputs;
-
-    if (initialiseRandomData)
+    if (initialiseRandomWeights)
     {
         double limit = std::sqrt(6.0 / (numOfInputs + numOfOutputs)); // Xavier initialization
         m_weights = MathUtility::getRandomData(numOfInputs, -limit, limit);
-        m_bias = MathUtility::getRandomData(-limit, limit);
     }
     else
     {
         m_weights.assign(numOfInputs, 0.0);
-        m_bias = 0.0;
     }
 }
 
