@@ -186,7 +186,6 @@ void Layer::feedForward(const std::vector<double>& inputs)
     for (size_t idx = 0; idx < m_neurons.size(); ++idx)
     {
         m_neurons[idx]->activate(inputs);
-        m_outputs[idx] = m_neurons[idx]->getOutput();
     }
 }
 

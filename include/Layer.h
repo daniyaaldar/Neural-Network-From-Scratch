@@ -33,6 +33,7 @@ public:
     void calculateOutputGradients(const std::vector<double>& targets);
     void calculateHiddenGradients(const Layer& nextLayer);
     void updateWeights(Layer& nextLayer);
+    void updateBiases();
     void print() const;
 
 private:

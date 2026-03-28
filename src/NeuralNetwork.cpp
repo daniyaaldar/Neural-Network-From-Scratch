@@ -350,9 +350,12 @@ void NeuralNetwork::backwardsPropagate(const std::vector<double>& targets)
     // Update weights
     for (size_t i = 0; i < m_layers.size() - 1; i++)
     {
-        std::unique_ptr<Layer>& currentLayer = m_layers[i];
-        std::unique_ptr<Layer>& nextLayer = m_layers[i + 1];
+        m_layers[i]->updateWeights(*m_layers[i + 1]);
+    }
 
-        currentLayer->updateWeights(*nextLayer);
+    // Update biases (skip input layer)
+    for (size_t i = 1; i < m_layers.size(); i++) 
+    {
+        m_layers[i]->updateBiases();
     }
 }
