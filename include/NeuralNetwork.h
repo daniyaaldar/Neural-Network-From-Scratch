@@ -38,7 +38,7 @@ public:
     std::vector<std::vector<double>>              getBiases() const;
     std::vector<double>                           getBiases(size_t layerIdx) const;
     double                                        getBias(size_t layerIdx, size_t neuronIdx) const;
-    std::vector<double>                           getOutput() const { return m_layers.back()->getOutputs(); }
+    const std::vector<double>&                    getOutput() const { return m_layers.back()->getOutputs(); }
     double                                        getError(const std::vector<double>& targets) const;
     double                                        getDelta(size_t layerIdx, size_t neuronIdx) const { return m_layers[layerIdx]->getNeuron(neuronIdx).getDelta(); } // TODO add error check
 

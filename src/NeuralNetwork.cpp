@@ -2,6 +2,9 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <numeric>
+#include <algorithm>
+#include <chrono>
 
 NeuralNetwork::NeuralNetwork(const std::vector<size_t>& topology,
     MathUtility::ActivationFunction activationFunc,
@@ -269,22 +272,34 @@ void NeuralNetwork::learn(size_t epochs, const std::vector<std::vector<double>>&
         throw std::invalid_argument("Input and target count mismatch");
     }
 
+    std::vector<size_t> indices(inputs.size());
+    std::iota(indices.begin(), indices.end(), 0);
+    std::mt19937 rng{ std::random_device{}() };
+
     for (size_t iteration = 0; iteration < epochs; iteration++)
     {
+        std::shuffle(indices.begin(), indices.end(), rng);
+
         int correct = 0;
         double epochError = 0.0;
+        auto epochStart = std::chrono::steady_clock::now();
+
         for (size_t sampleIdx = 0; sampleIdx < inputs.size(); sampleIdx++)
         {
-            feedForward(inputs[sampleIdx]);
-            backwardsPropagate(targets[sampleIdx]);
+            size_t idx = indices[sampleIdx];
+            feedForward(inputs[idx]);
+            backwardsPropagate(targets[idx]);
             epochError += m_error;
 
             const std::vector<double>& outputs = getOutput();
             int predicted = std::max_element(outputs.begin(), outputs.end()) - outputs.begin();
-            int expected = std::max_element(targets[sampleIdx].begin(), targets[sampleIdx].end()) - targets[sampleIdx].begin();
+            int expected = std::max_element(targets[idx].begin(), targets[idx].end()) - targets[idx].begin();
             if (predicted == expected)
                 ++correct;
         }
+
+        auto epochEnd = std::chrono::steady_clock::now();
+        double elapsed = std::chrono::duration<double>(epochEnd - epochStart).count();
 
         if (logInterval > 0 && iteration % logInterval == 0)
         {
@@ -295,6 +310,7 @@ void NeuralNetwork::learn(size_t epochs, const std::vector<std::vector<double>>&
                 << " | Accuracy: " << accuracy << "%"
                 << " | Correct: " << correct
                 << " | Wrong: " <<  inputs.size() - correct
+                << " | Time Taken: " <<  elapsed
                 << "\n";
         }
     }
@@ -309,14 +325,14 @@ std::vector<double> NeuralNetwork::feedForward(const std::vector<double>& inputs
 
     m_layers[0]->setOutputs(inputs);
 
-    for (size_t i = 1; i < m_layers.size(); ++i)
+    size_t numLayers = m_layers.size();
+    for (size_t i = 1; i < numLayers; ++i)
     {
         const std::vector<double>& lastLayerOutput = m_layers[i - 1]->getOutputs();
         m_layers[i]->feedForward(lastLayerOutput);
     }
 
     std::vector<double> outputs = getOutput();
-    outputs.reserve(outputs.size());
 
     return outputs;
 }
