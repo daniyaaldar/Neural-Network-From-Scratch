@@ -3,30 +3,36 @@
 #include <vector>
 #include "MathUtility.h"
 
+class Layer;
+
 class Neuron 
 {
 public:
-    Neuron(size_t numOfInputs, size_t numOfOutputs, MathUtility::ActivationFunction activationFunc, double learningRate, bool initialiseRandomWeights = true);
+    Neuron(size_t neuronIdx, size_t numOfInputs, size_t numOfOutputs, MathUtility::ActivationFunction activationFunc, double learningRate, bool initialiseRandomWeights = true);
 
     void print() const;
-    void setOutput(double output) { m_output = output; };
-    void setBias(double bias) { m_bias = bias; };
-    void setDelta(double delta) { m_delta = delta; };
-    void setNumOfInputs(size_t numOfInputs) { m_weights = MathUtility::getRandomData(numOfInputs, -1.0, 1.0); }
-    void setWeights(const std::vector<double>& weights) { m_weights = weights; };
+    void setOutput(double output) { m_output = output; }
+    void setBias(double bias) { m_bias = bias; }
+    void setDelta(double delta) { m_delta = delta; }
+    void setWeights(const std::vector<double>& weights) { m_weights = weights; }
+    void setWeight(size_t weightIdx, double weight) { m_weights[weightIdx] = weight; } // TODO add error checking
     
-    double getOutput() const { return m_output; };
-    double getBias() const { return m_bias; };
-    double getDelta() const { return m_delta; };
-    size_t getNumOfInputs() const { return m_weights.size(); };
-    std::vector<double> getWeights() const { return m_weights; };
+    double getOutput() const { return m_output; }
+    double getBias() const { return m_bias; }
+    double getDelta() const { return m_delta; }
+    size_t getNumOfInputs() const { return m_weights.size(); }
+    std::vector<double> getWeights() const { return m_weights; }
+    double getWeight(size_t idx) const { return m_weights[idx]; }
 
     void activate(const std::vector<double>& inputs);
-    double activateDerivative(double x) const;
-    std::vector<double> backwardsPropagate(double target);
-    void calculateDelta(double target);
+    void calculateOutputGradient(double target);
+    void calculateHiddenGradient(const Layer& nextLayer);
+    void updateWeights(Layer& nextLayer);
 
 private:    
+    double sumDerivativesOfWeights(const Layer& nextLayer) const;
+
+    size_t m_neuronIdx = 0;
     size_t m_numOfInputs = 0;
     size_t m_numOfOutputs = 0;
     std::vector<double> m_weights; // input weights

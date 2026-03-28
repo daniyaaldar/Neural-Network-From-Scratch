@@ -86,8 +86,7 @@ double MathUtility::linearDerivative(double x)
 
 double MathUtility::sigmoidDerivative(double x)
 {
-    double s = sigmoid(x);
-    return s * (1.0 - s);
+    return x * (1.0 - x);
 }
 
 double MathUtility::ReLuDerivative(double x)

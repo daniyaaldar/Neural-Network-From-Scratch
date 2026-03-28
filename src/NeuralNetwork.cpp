@@ -3,22 +3,36 @@
 #include <stdexcept>
 #include <string>
 
-NeuralNetwork::NeuralNetwork(const std::vector<size_t>& topology, MathUtility::ActivationFunction activationFunc, double learningRate, bool initialiseRandomWeights)
+NeuralNetwork::NeuralNetwork(const std::vector<size_t>& topology,
+    MathUtility::ActivationFunction activationFunc,
+    MathUtility::ErrorFunction errorFunc,
+    double learningRate,
+    bool initialiseRandomWeights)
     : 
-    m_activationFunc(activationFunc),
-    m_learningRate(learningRate)
+    NeuralNetwork(topology, activationFunc, MathUtility::ActivationFunction::LINEAR, errorFunc, learningRate, initialiseRandomWeights)
 {
+}
+
+NeuralNetwork::NeuralNetwork(const std::vector<size_t>& topology,
+    MathUtility::ActivationFunction activationFunc,
+    MathUtility::ActivationFunction outputActivationFunc,
+    MathUtility::ErrorFunction errorFunc,
+    double learningRate,
+    bool initialiseRandomWeights)
+{
+    const size_t numLayers = topology.size();
+
+    if (numLayers < 2)
+    {
+        throw std::invalid_argument("Network must have at least input and output layer");
+    }
+
     if (learningRate <= 0.0)
     {
         throw std::invalid_argument("Learning rate must be positive");
     }
 
-    if (topology.size() < 2)
-    {
-        throw std::invalid_argument("Network must have at least input and output layer");
-    }
-
-    for (size_t i = 0; i < topology.size(); ++i)
+    for (size_t i = 0; i < numLayers; ++i)
     {
         if (topology[i] == 0)
         {
@@ -26,54 +40,30 @@ NeuralNetwork::NeuralNetwork(const std::vector<size_t>& topology, MathUtility::A
         }
     }
 
-    m_layers.reserve(topology.size());
+    m_error = 0.0;
+    m_activationFunc = activationFunc;
+    m_outputActivationFunc = outputActivationFunc;
+    m_errorFunc = MathUtility::getErrorFunc(errorFunc);
+    m_learningRate = learningRate;
 
-    for (size_t i = 0; i < topology.size(); ++i)
+    m_layers.reserve(numLayers);
+    for (size_t i = 0; i < numLayers; ++i)
     {
-        size_t inputsPerNeuron = (i == 0) ? 0 : topology[i - 1];
-        size_t outputsPerNeuron = (i == topology.size() - 1) ? 0 : topology[i + 1];
+        const bool isInputLayer = (i == 0);
+        const bool isOutputLayer = (i == numLayers - 1);
 
-        m_layers.push_back(std::make_unique<Layer>(i, topology[i], inputsPerNeuron, outputsPerNeuron, activationFunc, learningRate, initialiseRandomWeights));
+        const size_t inputsPerNeuron = isInputLayer ? 0 : topology[i - 1];
+        const size_t outputsPerNeuron = isOutputLayer ? 0 : topology[i + 1];
+
+        const MathUtility::ActivationFunction layerActivationFunc = isOutputLayer ? m_outputActivationFunc : m_activationFunc;
+
+        m_layers.push_back(std::make_unique<Layer>(i, topology[i], inputsPerNeuron, outputsPerNeuron, layerActivationFunc, m_learningRate, initialiseRandomWeights));
     }
 }
 
-NeuralNetwork::~NeuralNetwork()
+double NeuralNetwork::getError(const std::vector<double>& targets) const
 {
-}
-
-void NeuralNetwork::print() const
-{
-    for (size_t i = 0; i < m_layers.size(); ++i)
-    {
-        std::cout << "LAYER " << i << std::endl;
-        m_layers[i]->print();
-        std::cout << "\n";
-    }
-}
-
-void NeuralNetwork::feedForward(const std::vector<double>& inputs)
-{
-    if (inputs.size() != m_layers.front()->getNumOfNeurons())
-    {
-        throw std::invalid_argument("Input size does not match number of neurons in input layer (Has " + std::to_string(inputs.size()) + ", expecting " + std::to_string(m_layers.front()->getNumOfNeurons()) + ")");
-    }
-
-    m_layers[0]->setOutputs(inputs);
-    
-    for (size_t i = 1; i < m_layers.size(); ++i)
-    {
-        m_layers[i]->feedForward(m_layers[i - 1]->getOutputs());
-    }
-}
-
-void NeuralNetwork::backwardsPropagate(const std::vector<double>& targets)
-{
-    if (targets.size() != m_layers.back()->getNumOfNeurons())
-    {
-        throw std::invalid_argument("Target size does not match number of neurons in output layer (Has " + std::to_string(targets.size()) + ", expecting " + std::to_string(m_layers.back()->getNumOfNeurons()) + ")");
-    }
-
-    // TODO
+    return m_errorFunc(m_layers.back()->getOutputs(), targets);
 }
 
 void NeuralNetwork::setWeights(const std::vector<Matrix>& weights)
@@ -215,4 +205,154 @@ void NeuralNetwork::setBias(size_t layerIdx, size_t neuronIdx, double bias)
     }
 
     m_layers[layerIdx]->setBias(neuronIdx, bias);
+}
+
+std::vector<std::vector<std::vector<double>>> NeuralNetwork::getWeights() const
+{
+    std::vector<std::vector<std::vector<double>>> weights;
+    weights.reserve(m_layers.size());
+
+    for (const std::unique_ptr<Layer>& layer : m_layers)
+    {
+        weights.push_back(layer->getWeights());
+    }
+    
+    return weights;
+}
+
+std::vector<std::vector<double>> NeuralNetwork::getWeights(size_t layerIdx) const
+{
+    return m_layers[layerIdx]->getWeights();
+}
+
+std::vector<double> NeuralNetwork::getWeights(size_t layerIdx, size_t neuronIdx) const
+{
+    return m_layers[layerIdx]->getNeuron(neuronIdx).getWeights();
+}
+
+double NeuralNetwork::getWeight(size_t layerIdx, size_t neuronIdx, size_t weightIdx) const
+{
+    return m_layers[layerIdx]->getNeuron(neuronIdx).getWeight(weightIdx);
+}
+
+std::vector<Matrix> NeuralNetwork::getWeightsAsMatrices() const
+{
+    std::vector<Matrix> weightMatricies;
+
+    for (const std::unique_ptr<Layer>& layer : m_layers)
+    {
+        weightMatricies.push_back(layer->getWeightsAsMatrix());
+    }
+
+    return weightMatricies;
+}
+
+Matrix NeuralNetwork::getLayerWeightsAsMatrix(size_t layerIdx) const
+{
+    return m_layers[layerIdx]->getWeightsAsMatrix();
+}
+
+void NeuralNetwork::print() const
+{
+    for (size_t i = 0; i < m_layers.size(); ++i)
+    {
+        std::cout << "LAYER " << i << std::endl;
+        m_layers[i]->print();
+        std::cout << "\n";
+    }
+}
+
+void NeuralNetwork::learn(size_t epochs, const std::vector<std::vector<double>>& inputs, const std::vector<std::vector<double>>& targets, size_t logInterval)
+{
+    if (inputs.size() != targets.size())
+    {
+        throw std::invalid_argument("Input and target count mismatch");
+    }
+
+    for (size_t iteration = 0; iteration < epochs; iteration++)
+    {
+        int correct = 0;
+        double epochError = 0.0;
+        for (size_t sampleIdx = 0; sampleIdx < inputs.size(); sampleIdx++)
+        {
+            feedForward(inputs[sampleIdx]);
+            backwardsPropagate(targets[sampleIdx]);
+            epochError += m_error;
+
+            const std::vector<double>& outputs = getOutput();
+            int predicted = std::max_element(outputs.begin(), outputs.end()) - outputs.begin();
+            int expected = std::max_element(targets[sampleIdx].begin(), targets[sampleIdx].end()) - targets[sampleIdx].begin();
+            if (predicted == expected)
+                ++correct;
+        }
+
+        if (logInterval > 0 && iteration % logInterval == 0)
+        {
+            double accuracy = 100.0 * correct / inputs.size();
+            std::cout 
+                << "Epoch " << iteration
+                << " | Error: " << epochError / inputs.size()
+                << " | Accuracy: " << accuracy << "%"
+                << " | Correct: " << correct
+                << " | Wrong: " <<  inputs.size() - correct
+                << "\n";
+        }
+    }
+}
+
+std::vector<double> NeuralNetwork::feedForward(const std::vector<double>& inputs)
+{
+    if (inputs.size() != m_layers.front()->getNumOfNeurons())
+    {
+        throw std::invalid_argument("Input size does not match number of neurons in input layer (Has " + std::to_string(inputs.size()) + ", expecting " + std::to_string(m_layers.front()->getNumOfNeurons()) + ")");
+    }
+
+    m_layers[0]->setOutputs(inputs);
+
+    for (size_t i = 1; i < m_layers.size(); ++i)
+    {
+        const std::vector<double>& lastLayerOutput = m_layers[i - 1]->getOutputs();
+        m_layers[i]->feedForward(lastLayerOutput);
+    }
+
+    std::vector<double> outputs = getOutput();
+    outputs.reserve(outputs.size());
+
+    return outputs;
+}
+
+void NeuralNetwork::backwardsPropagate(const std::vector<double>& targets)
+{
+    const std::unique_ptr<Layer>& outputLayer = m_layers.back();
+
+    if (targets.size() != outputLayer->getNumOfNeurons())
+    {
+        throw std::invalid_argument("Target size does not match number of neurons in output layer (Has " +
+            std::to_string(targets.size()) + ", expecting " +
+            std::to_string(m_layers.back()->getNumOfNeurons()) + ")");
+    }
+
+    // Calculate output layer error
+    m_error = m_errorFunc(outputLayer->getOutputs(), targets);
+
+    // Calculate output layer gradients
+    outputLayer->calculateOutputGradients(targets);
+
+    // Calculate gradients on hidden layers
+    for (size_t i = m_layers.size() - 2; i > 0; i--)
+    {
+        std::unique_ptr<Layer>& currentLayer = m_layers[i];
+        std::unique_ptr<Layer>& nextLayer = m_layers[i + 1];
+
+        currentLayer->calculateHiddenGradients(*nextLayer);
+    }
+
+    // Update weights
+    for (size_t i = 0; i < m_layers.size() - 1; i++)
+    {
+        std::unique_ptr<Layer>& currentLayer = m_layers[i];
+        std::unique_ptr<Layer>& nextLayer = m_layers[i + 1];
+
+        currentLayer->updateWeights(*nextLayer);
+    }
 }
