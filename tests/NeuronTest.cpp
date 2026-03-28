@@ -3,6 +3,6 @@
 
 TEST(NeuronTest, Construction)
 {
-    Neuron n(3, 1,MathUtility::ActivationFunction::RELU, 0.0001);
+    Neuron n(0, 3, 1,MathUtility::ActivationFunction::RELU, 0.0001);
     EXPECT_EQ(n.getNumOfInputs(), 3);
 }
