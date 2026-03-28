@@ -28,6 +28,7 @@ public:
     void calculateOutputGradient(double target);
     void calculateHiddenGradient(const Layer& nextLayer);
     void updateWeights(Layer& nextLayer);
+    void updateBias();
 
 private:    
     double sumDerivativesOfWeights(const Layer& nextLayer) const;

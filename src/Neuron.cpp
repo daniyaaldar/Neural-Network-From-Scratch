@@ -79,3 +79,8 @@ void Neuron::updateWeights(Layer& nextLayer)
         nextNeuron.setWeight(m_neuronIdx, updatedWeight);
     }
 }
+
+void Neuron::updateBias()
+{
+    m_bias -= m_learningRate * m_delta;
+}
