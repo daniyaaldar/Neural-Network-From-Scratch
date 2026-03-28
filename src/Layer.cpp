@@ -86,6 +86,11 @@ void Layer::setBias(size_t neuronIdx, double bias)
 
 const std::vector<double>& Layer::getOutputs() const
 {
+    for (size_t idx = 0; idx < m_neurons.size(); ++idx)
+    {
+        m_outputs[idx] = m_neurons[idx]->getOutput();
+    }
+
     return m_outputs;
 }
 
@@ -213,6 +218,15 @@ void Layer::updateWeights(Layer& nextLayer)
     for (size_t i = 0; i < numOfNeurons; i++)
     {
         getNeuron(i).updateWeights(nextLayer);
+    }
+}
+
+void Layer::updateBiases()
+{
+    size_t numOfNeurons = getNumOfNeurons();
+    for (size_t i = 0; i < numOfNeurons; i++)
+    {
+        getNeuron(i).updateBias();
     }
 }
 
