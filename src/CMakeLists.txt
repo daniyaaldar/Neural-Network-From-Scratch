@@ -4,6 +4,7 @@ add_library(neural_network_lib
     Layer.cpp 
     MathUtility.cpp 
     Matrix.cpp
+    MNIST_dataloader.cpp
 )
 
 target_include_directories(neural_network_lib
