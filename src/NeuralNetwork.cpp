@@ -316,7 +316,7 @@ void NeuralNetwork::learn(size_t epochs, const std::vector<std::vector<double>>&
     }
 }
 
-std::vector<double> NeuralNetwork::feedForward(const std::vector<double>& inputs)
+const std::vector<double>& NeuralNetwork::feedForward(const std::vector<double>& inputs)
 {
     if (inputs.size() != m_layers.front()->getNumOfNeurons())
     {
@@ -332,9 +332,7 @@ std::vector<double> NeuralNetwork::feedForward(const std::vector<double>& inputs
         m_layers[i]->feedForward(lastLayerOutput);
     }
 
-    std::vector<double> outputs = getOutput();
-
-    return outputs;
+    return getOutput();
 }
 
 void NeuralNetwork::backwardsPropagate(const std::vector<double>& targets)

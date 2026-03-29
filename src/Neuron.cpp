@@ -38,10 +38,14 @@ void Neuron::activate(const std::vector<double>& inputs)
         throw std::invalid_argument("Input size does not match weight size");
     }
 
+    const double* inPtr = inputs.data();
+    const double* wPtr = m_weights.data();
+    const size_t n = m_weights.size();
+
     double total = m_bias;
-    for (size_t i = 0; i < inputs.size(); i++)
+    for (size_t i = 0; i < n; ++i)
     {
-        total += inputs[i] * m_weights[i];
+        total += inPtr[i] * wPtr[i];
     }
 
     m_output = m_activationFunc(total);
@@ -72,11 +76,17 @@ void Neuron::calculateHiddenGradient(const Layer& nextLayer)
 
 void Neuron::updateWeights(Layer& nextLayer)
 {
-    for (size_t i = 0; i < nextLayer.getNumOfNeurons(); i++)
+    // Update the weights of neurons in the next layer that connect from this neurons output
+    size_t numOfNeurons = nextLayer.getNumOfNeurons();
+    for (size_t i = 0; i < numOfNeurons; i++)
     {
         Neuron& nextNeuron = nextLayer.getNeuron(i);
-        double updatedWeight = nextNeuron.getWeight(m_neuronIdx) - m_learningRate * nextNeuron.getDelta() * m_output;
-        nextNeuron.setWeight(m_neuronIdx, updatedWeight);
+
+        // Access delta and weight vector directly to avoid repeated calls
+        double delta = nextNeuron.getDelta();
+        std::vector<double>& weightsRef = nextNeuron.getWeightsRef();
+
+        weightsRef[m_neuronIdx] -= nextNeuron.getLearningRate() * delta * m_output;
     }
 }
 

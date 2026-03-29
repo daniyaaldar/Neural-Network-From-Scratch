@@ -4,6 +4,7 @@
 #include <memory>
 #include "MathUtility.h"
 #include "Layer.h"
+#include "Matrix.h"
 
 class NeuralNetwork {
 public:
@@ -44,7 +45,7 @@ public:
 
     void                                          print() const;
     void                                          learn(size_t epochs, const std::vector<std::vector<double>>& inputs, const std::vector<std::vector<double>>& targets, size_t logInterval = 0);
-    std::vector<double>                           feedForward(const std::vector<double>& inputs);
+    const std::vector<double>&                    feedForward(const std::vector<double>& inputs);
     void                                          backwardsPropagate(const std::vector<double>& targets);
 
 private:

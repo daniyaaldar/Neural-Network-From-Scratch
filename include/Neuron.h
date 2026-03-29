@@ -22,7 +22,10 @@ public:
     double getDelta() const { return m_delta; }
     size_t getNumOfInputs() const { return m_weights.size(); }
     std::vector<double> getWeights() const { return m_weights; }
+    const std::vector<double>& getWeightsRef() const { return m_weights; }
+    std::vector<double>& getWeightsRef() { return m_weights; }
     double getWeight(size_t idx) const { return m_weights[idx]; }
+    double getLearningRate() const { return m_learningRate; }
 
     void activate(const std::vector<double>& inputs);
     void calculateOutputGradient(double target);

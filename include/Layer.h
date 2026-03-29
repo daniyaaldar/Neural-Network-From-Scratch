@@ -25,7 +25,8 @@ public:
     Matrix getWeightsAsMatrix() const;
     std::vector<double> getBiases() const;
     double getBias(size_t neuronIdx) const;
-    Neuron& getNeuron(size_t neuronIdx) const { return *m_neurons[neuronIdx]; }
+    Neuron& getNeuron(size_t neuronIdx) { return m_neurons[neuronIdx]; }
+    const Neuron& getNeuron(size_t neuronIdx) const { return m_neurons[neuronIdx]; }
     size_t getNumOfNeurons() const { return m_neurons.size(); }
     size_t getNumInputsPerNeuron() const { return m_inputsPerNeuron; }
 
@@ -39,6 +40,6 @@ public:
 private:
     size_t m_layerIdx;
     size_t m_inputsPerNeuron;
-    std::vector<std::unique_ptr<Neuron>> m_neurons;
+    std::vector<Neuron> m_neurons;
     mutable std::vector<double> m_outputs; // cached outputs to avoid reallocations
 };
