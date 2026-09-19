@@ -2,6 +2,7 @@
 #include "Layer.h"
 #include <random>
 #include <iostream>
+#include <cassert>
 
 Neuron::Neuron(size_t neuronIdx, size_t numOfInputs, size_t numOfOutputs, MathUtility::ActivationFunction activationFunc, double learningRate, bool initialiseRandomWeights)
     : 
@@ -54,6 +55,8 @@ void Neuron::activate(const std::vector<double>& inputs)
 void Neuron::calculateOutputGradient(double target)
 {
     m_delta = (m_output - target) * m_activationDerivativeFunc(m_output);
+    assert(!std::isinf(m_delta));
+    assert(std::abs(m_delta) < 1e10);
 }
 
 double Neuron::sumDerivativesOfWeights(const Layer& nextLayer) const
@@ -72,6 +75,8 @@ void Neuron::calculateHiddenGradient(const Layer& nextLayer)
 {
     double sumDow = sumDerivativesOfWeights(nextLayer);
     m_delta = sumDow * m_activationDerivativeFunc(m_output);
+    assert(!std::isinf(m_delta));
+    assert(std::abs(m_delta) < 1e10);
 }
 
 void Neuron::updateWeights(Layer& nextLayer)

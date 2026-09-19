@@ -200,7 +200,7 @@ std::function<double(double)> MathUtility::getActivationDerivativeFunc(Activatio
     }
 }
 
-std::function<double(const std::vector<double>&, const std::vector<double>&)> MathUtility::getErrorFunc(ErrorFunction errorFunction)
+std::function<double(const std::vector<double>& outputs, const std::vector<double>& target)> MathUtility::getErrorFunc(ErrorFunction errorFunction)
 {
     switch (errorFunction)
     {

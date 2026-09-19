@@ -11,7 +11,7 @@ protected:
     size_t outputsPerNeuron = 3;
     MathUtility::ActivationFunction activationFunc = MathUtility::ActivationFunction::LINEAR;
     double learningRate = 0.1;
-    bool initialiseRandomData = false; // deterministic (biases and weights are set to zero)
+    bool initialiseRandomData = false;
 
     Layer layer{
         layerIdx,
